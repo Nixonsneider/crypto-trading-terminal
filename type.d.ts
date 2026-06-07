@@ -8,13 +8,13 @@ interface NextPageProps {
 interface CandlestickChartProps {
     data?: OHLCData[];
     liveOhlcv?: OHLCData | null;
-    coinId: string;
+    coinId?: string;
     height?: number;
     children?: React.ReactNode;
     mode?: 'historical' | 'live';
     initialPeriod?: Period;
-    liveInterval: '1s' | '1m';
-    setLiveInterval: (interval: '1s' | '1m') => void;
+    liveInterval?: '1s' | '1m';
+    setLiveInterval?: (interval: '1s' | '1m') => void;
 }
 
 interface ConverterProps {
@@ -108,6 +108,13 @@ interface ChartSectionProps {
     };
     coinOHLCData: OHLCData[];
     coinId: string;
+    period?: Period;
+    mode?: 'historical' | 'live';
+    height?: number;
+    liveOhlcv?: OHLCData | null;
+    liveInterval?: '1s' | '1m';
+    setLiveInterval?: (interval: '1s' | '1m') => void;
+    chartChildren?: React.ReactNode;
 }
 
 interface TopGainersLosers {

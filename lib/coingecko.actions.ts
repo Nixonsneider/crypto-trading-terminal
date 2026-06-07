@@ -1,6 +1,7 @@
 'use server';
 
 import qs from 'query-string';
+import { periodToDays } from '@/lib/chart.utils';
 
 const BASE_URL = process.env.COINGECKO_BASE_URL;
 const API_KEY = process.env.COINGECKO_API_KEY;
@@ -35,4 +36,21 @@ export async function fetcher<T>(
     }
 
     return response.json();
+}
+
+export async function fetchCoinDetails(coinId: string): Promise<CoinDetailsData> {
+    return fetcher<CoinDetailsData>(`/coins/${coinId}`, {
+        dex_pair_format: 'symbol',
+    });
+}
+
+export async function fetchCoinOhlc(
+    coinId: string,
+    period: Period = 'daily',
+): Promise<OHLCData[]> {
+    return fetcher<OHLCData[]>(`/coins/${coinId}/ohlc`, {
+        vs_currency: 'usd',
+        days: periodToDays(period),
+        precision: 'full',
+    });
 }

@@ -1,30 +1,37 @@
 import React from 'react'
-import { fetcher } from '@/lib/coingecko.actions'
-import { formatUsdPrice } from '@/lib/utils'
-import Image from 'next/image'
+import { fetchCoinDetails, fetchCoinOhlc } from '@/lib/coingecko.actions'
+import { parsePeriod } from '@/lib/chart.utils'
+import ChartSection from '@/components/ChartSection'
 import { CoinOverviewFallback } from './fallback'
 
+type CoinOverviewProps = {
+    period?: Period;
+}
 
-const CoinOverview = async () => {
-    let coin: CoinDetailsData
+const CoinOverview = async ({ period: periodParam }: CoinOverviewProps) => {
+    const period = periodParam ?? 'daily'
+
     try {
-        coin = await fetcher<CoinDetailsData>('/coins/bitcoin', {
-            dex_pair_format: 'symbol'
-        })
+        const [coin, coinOHLCData] = await Promise.all([
+            fetchCoinDetails('bitcoin'),
+            fetchCoinOhlc('bitcoin', period),
+        ])
+
+        return (
+            <div id="coin-overview">
+                <ChartSection
+                    coinData={coin}
+                    coinOHLCData={coinOHLCData}
+                    coinId="bitcoin"
+                    period={period}
+                    height={320}
+                />
+            </div>
+        )
     } catch (error) {
         console.error('[CoinOverview] Failed to fetch coin data:', error)
         return <CoinOverviewFallback />
     }
-    return (
-        <div id="coin-overview">
-            <div className="header pt-2">
-                <Image src={coin.image.large} alt={coin.name} width={56} height={56} />
-                <div className="info">
-                    <p>{coin.name} / {coin.symbol.toUpperCase()}</p>
-                    <h1>{formatUsdPrice(coin.market_data.current_price.usd)}</h1>
-                </div>
-            </div>
-        </div>
-    )
+
 }
 export default CoinOverview
